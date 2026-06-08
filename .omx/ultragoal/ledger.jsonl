@@ -1,0 +1,10 @@
+2026-06-08T19:22:03Z brief created: Qwen native provider session mapping
+2026-06-08T19:22:03Z G001 in_progress: map Hermes provider/session code paths using DeepSeek/ds_scout read-only search
+2026-06-08T19:33:21Z G001 completed: DeepSeek/ds_scout returned file:line evidence for provider resolution, chat kwargs, AIAgent session fields, request overrides, tests, and profile-safe storage candidates.
+2026-06-08T19:33:21Z G002 completed: Implemented agent/qwen_session_state.py, wired qwen-local metadata into build_api_kwargs, legacy transport top-level metadata, and response chatId/parentId persistence hook.
+2026-06-08T19:33:21Z G003 completed: python -m pytest tests/providers/test_profile_wiring.py tests/agent/test_custom_provider_extra_body.py tests/agent/test_qwen_session_state.py -q -o 'addopts=' -> 29 passed
+2026-06-08T19:33:21Z G004 in_progress: run live qwen-local smoke for context and tool_calls
+2026-06-08T19:36:26Z G004 completed: live Hermes/qwen-local smoke context_ok=true state_has_chat_parent=true tool_messages=1 assistant_tool_call_messages=1
+2026-06-08T19:36:26Z G005 in_progress: independent review and final gate
+2026-06-08T19:41:02Z G005 completed: independent review APPROVE_WITH_WARNINGS/no blockers; portal exclusion test added; targeted tests 30 passed; git diff --check clean
+2026-06-08T19:41:02Z aggregate_status completed_with_warnings: qwen-local context/tool smoke passed; remaining warnings non-blocking

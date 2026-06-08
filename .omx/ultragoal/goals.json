@@ -1,0 +1,61 @@
+{
+  "brief": "Qwen native provider session mapping",
+  "created_at": "2026-06-08T19:22:03Z",
+  "aggregate_status": "completed_with_warnings",
+  "root_problem": "Qwen через qwen-local теряет контекст, потому что Hermes не привязывает стабильную Hermes session к Qwen chatId/parentId.",
+  "quality_gates": {
+    "deepseek_search": "Read-only DeepSeek/ds_scout search for relevant provider/session code paths before implementation.",
+    "targeted_tests": "Pytest coverage for Qwen session state and non-Qwen regression.",
+    "live_smoke": "qwen-local live smoke for context preservation and tool_calls.",
+    "independent_review": "delegate_task reviewer returns APPROVE or non-blocking warnings only."
+  },
+  "goals": [
+    {
+      "id": "G001",
+      "title": "Map Hermes provider/session code paths",
+      "problem_solved": "Находит точные места, куда добавить Qwen state, не раздувая контекст главного агента.",
+      "acceptance": "DeepSeek/ds_scout or equivalent read-only subagent returns file:line evidence for provider setup, request creation, session id availability, and tests to extend.",
+      "status": "completed",
+      "evidence": "DeepSeek/ds_scout returned file:line evidence for provider resolution, chat kwargs, AIAgent session fields, request overrides, tests, and profile-safe storage candidates.",
+      "completed_at": "2026-06-08T19:33:21Z"
+    },
+    {
+      "id": "G002",
+      "title": "Implement Qwen session persistence",
+      "problem_solved": "Привязывает одну Hermes session к одному Qwen chatId/parentId so Qwen не забывает чат между сообщениями.",
+      "acceptance": "Code stores/restores Qwen chatId/parentId profile-safely for Qwen provider only; existing providers keep current request shape.",
+      "status": "completed",
+      "evidence": "Implemented agent/qwen_session_state.py, wired qwen-local metadata into build_api_kwargs, legacy transport top-level metadata, and response chatId/parentId persistence hook.",
+      "completed_at": "2026-06-08T19:33:21Z"
+    },
+    {
+      "id": "G003",
+      "title": "Add targeted tests",
+      "problem_solved": "Защищает новый Qwen mapping от регрессии и доказывает, что обычные custom providers не затронуты.",
+      "acceptance": "Relevant pytest tests pass and include Qwen state save/restore plus non-Qwen regression.",
+      "status": "completed",
+      "evidence": "python -m pytest tests/providers/test_profile_wiring.py tests/agent/test_custom_provider_extra_body.py tests/agent/test_qwen_session_state.py -q -o 'addopts=' -> 29 passed",
+      "completed_at": "2026-06-08T19:33:21Z"
+    },
+    {
+      "id": "G004",
+      "title": "Run live qwen-local smoke",
+      "problem_solved": "Проверяет реальное поведение на поднятом Qwen proxy, а не только unit tests.",
+      "acceptance": "Live smoke shows same-session context preservation and OpenAI-compatible tool_calls through qwen-local.",
+      "status": "completed",
+      "evidence": "Live qwen-local smoke through Hermes AIAgent: context_ok=true with persisted qwen_sessions chatId/parentId; terminal tool smoke produced one assistant tool_call and one tool message.",
+      "completed_at": "2026-06-08T19:36:26Z"
+    },
+    {
+      "id": "G005",
+      "title": "Independent review and final gate",
+      "problem_solved": "Снижает риск архитектурного костыля, утечек секретов или поломки Hermes tool loop.",
+      "acceptance": "Independent subagent review returns APPROVE/APPROVE_WITH_WARNINGS with no blockers; final verification commands and git diff are recorded.",
+      "status": "completed",
+      "evidence": "Independent delegate_task review returned APPROVE_WITH_WARNINGS with no blockers; W2 portal-exclusion test gap fixed; targeted tests now 30 passed; git diff --check clean.",
+      "completed_at": "2026-06-08T19:41:02Z"
+    }
+  ],
+  "completed_at": "2026-06-08T19:41:02Z",
+  "final_evidence": "Tests: python -m pytest tests/providers/test_profile_wiring.py tests/agent/test_custom_provider_extra_body.py tests/agent/test_qwen_session_state.py -q -o addopts= -> 30 passed. Live smoke: context_ok=true, state_has_chat_parent=true, tool_messages=1, assistant_tool_call_messages=1. Review: APPROVE_WITH_WARNINGS no blockers. Remaining warnings are non-blocking: broad qwen-name detection, no eviction for qwen_sessions.json, no explicit chmod beyond mkstemp default."
+}
